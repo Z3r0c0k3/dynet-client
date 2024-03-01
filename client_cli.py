@@ -14,7 +14,7 @@ def clear():
         os.system("clear")
 
 def connect(id, pw):
-    url = 'http://vpn.example.kr/signin'
+    url = 'http://vpn.internal.dyhs.kr/signin'
 
     request = {
         'id': id,
@@ -23,6 +23,16 @@ def connect(id, pw):
 
     response = requests.post(url, json=request)
     response_data = response.json()
+
+    if response_data['message'] != 'Success':
+        print("오류가 발생했습니다.")
+        clear()
+        print('비밀번호 변경이 실패하였습니다.')
+        print(f"에러 메시지: {response_data['message']}")
+        pause = input("엔터를 입력하시면 메인페이지로 이동합니다.")
+
+        if pause != None:
+            main()
 
     peer = response_data['peer']
     decode_peer = base64.b64decode(peer)
@@ -99,7 +109,7 @@ def disconnect(id):
     exit()
 
 def change_password(id, pw, change_pw):
-    url = 'http://vpn.example.kr/password-change'
+    url = 'http://vpn.internal.dyhs.kr/password-change'
     request = {
         'id': id,
         'password': pw,
@@ -135,11 +145,11 @@ def main():
 
     if choice == '1':
         clear()
-        print("[-------------------{{도움말 페이지}}------------------]")
+        print("[--------------------------{{도움말 페이지}}--------------------------]")
         print("# 위 프로그램은 덕영고등학교 학생용 가상사설망(VPN) 클라이언트 입니다.")
         print("# 프로그램을 사용하기 위해서 관리자에게 계정생성을 요청해야 합니다.")
         print("# 자세한 사항은 아래 링크를 참고 부탁드립니다.")
-        print("# https://dyhs.kr")
+        print("# https://zerocoke.gitbook.io/dy-net/")
         pause = input("엔터를 입력하시면 메인페이지으로 이동합니다.")
         
         if pause != None:
