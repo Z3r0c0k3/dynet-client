@@ -1,3 +1,5 @@
-# 개요
-
-이 소프트웨어는 VPN 클라이언트 입니다.
+# DYNET Client
+덕영고등학교 외부망 VPN Client
+## How to run
+- Windows
+  - Run `auto-starter_(Windows).bat`
