@@ -47,7 +47,7 @@ if %errorlevel% neq 0 (
 echo Python installer download complete.
 
 echo Installing Python . . . 
-start /wait %python_installer% /norestart /passive
+start /wait %python_installer% PrependPath=1 /norestart /passive
 if %errorlevel% neq 0 (
     echo Failed to install Python. Please try again later.
     echo.
