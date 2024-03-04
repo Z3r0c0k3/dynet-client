@@ -54,9 +54,9 @@ if %errorlevel% neq 0 (
     echo   Please check the installation process manually.
     goto python_install_check
 )
+del %python_installer%
 echo Python installation successful.
 
-rem Add Python installation directory to PATH
 set "python_dir=C:\Program Files\Python312"
 set "path=%python_dir%;%path%"
 
