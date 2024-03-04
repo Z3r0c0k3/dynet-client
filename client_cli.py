@@ -242,14 +242,15 @@ def main():
     
     # admin check
     if is_admin() == False:
-        print("관리자 권한이 아닙니다.")
+        print("현재 관리자 권한이 아닙니다.")
 
     print(f"========================================")
     if is_admin() == False:
         if platform_name == "Windows":
-            print("관리자 권한으로 다시 실행합니다 . . . ")
+            print("관리자 권한으로 다시 실행합니다(Windows) . . . ")
             ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
             sys.exit()
+        # ~~~
 
     if alert_msg != None: print(f"\n! {alert_msg}", end="\n\n"); alert_msg = None
     print("1. 도움말                  ")
