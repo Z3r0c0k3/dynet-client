@@ -27,6 +27,7 @@ if errorlevel 2 (
 
 :python_installed
 echo Python is installed
+cls
 echo start DyNET-Client . . . 
 python updater.py
 python client_cli.py
@@ -37,7 +38,7 @@ set "python_url=https://www.python.org/ftp/python/3.12.2/python-3.12.2-amd64.exe
 set "python_installer=python-3.12.2-amd64.exe"
 
 echo Start installing Python.
-echo Downloading python installer . . . 
+echo Downloading python installer . . . (This may take several minutes.)
 powershell -command "(New-Object Net.WebClient).DownloadFile('%python_url%', '%python_installer%')"
 if %errorlevel% neq 0 (
     echo ! Python installer download failed.
@@ -47,16 +48,18 @@ if %errorlevel% neq 0 (
 echo Python installer download complete.
 
 echo Installing Python . . . 
-start /wait %python_installer% PrependPath=1 /norestart /passive
+start /wait "" %python_installer% /passive InstallAllUsers=1 PrependPath=1 Include_test=0
 if %errorlevel% neq 0 (
-    echo Failed to install Python. Please try again later.
-    echo.
-    del %python_installer%
+    echo ! Python installation failed.
+    echo   Please check the installation process manually.
     goto python_install_check
 )
-del %python_installer%
 echo Python installation successful.
-echo.
+
+rem Add Python installation directory to PATH
+set "python_dir=C:\Program Files\Python312"
+set "path=%python_dir%;%path%"
+
 goto python_install_check
 
 :force_end
