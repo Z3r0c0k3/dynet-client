@@ -14,24 +14,21 @@ from image2ascii.image2ascii import image2ascii
 
 saved_paths = []
 
+
 def connect(id, pw):
-    url = 'http://vpn.internal.dyhs.kr/signin'
-    request = {
-        'id': id,
-        'password': pw
-    }
+    url = "http://vpn.external.dyhs.kr/signin"
+    request = {"id": id, "password": pw}
 
     print("연결 중 . . . ")
     try:
         response = requests.post(url, json=request)
         response_data = response.json()
-        response_msg = response_data['message']
+        response_msg = response_data["message"]
     except KeyboardInterrupt:
         return 5
     except Exception as e:
         print(e)
         return 2
-
 
     if response_msg != "Success":
         if response_msg == "Password not matched" or response_msg == "User not found":
@@ -40,32 +37,32 @@ def connect(id, pw):
     print("연결 성공")
     print("")
 
-    peer = response_data['peer']
+    peer = response_data["peer"]
     peer = base64.b64decode(peer)
-    peer = peer.decode('utf-8')
+    peer = peer.decode("utf-8")
     peer = literal_eval(peer)
 
-    p_private_key   = peer['privateKey']
-    p_address       = peer['address']
-    p_public_key    = peer['publicKey']
-    p_preshared_key = peer['presharedKey']
-    p_endpoint      = peer['endpoint']
-    p_allowed_ip    = peer['allowedIPs']
-    p_dns           = peer['dns']
+    p_private_key = peer["privateKey"]
+    p_address = peer["address"]
+    p_public_key = peer["publicKey"]
+    p_preshared_key = peer["presharedKey"]
+    p_endpoint = peer["endpoint"]
+    p_allowed_ip = peer["allowedIPs"]
+    p_dns = peer["dns"]
 
     config = ""
-    config +=  "[Interface]\n"
+    config += "[Interface]\n"
     config += f"PrivateKey = {p_private_key}\n"
     config += f"Address = {p_address}\n"
     config += f"DNS = {p_dns}\n"
-    config +=  "\n"
-    config +=  "[Peer]\n"
+    config += "\n"
+    config += "[Peer]\n"
     config += f"PublicKey = {p_public_key}\n"
     config += f"PresharedKey = {p_preshared_key}\n"
     config += f"AllowedIPs = {p_allowed_ip}\n"
     config += f"Endpoint = {p_endpoint}"
 
-    if platform_name == 'Windows':
+    if platform_name == "Windows":
         save_path = r"C:\Program Files\WireGuard\Data\Configurations"
         save_name = f"{id}_{get_now_ftime()}.conf"
         last_save_path = None
@@ -97,14 +94,16 @@ def connect(id, pw):
             print(f'File Name "{save_name}"')
             print("저장된 피어를 연결할 수 있습니다.")
             print("")
-            print("! 사용 후 연결했거나 저장한 정보를 꼭 제거하세요(WireGuard 하단 X표시).")
+            print(
+                "! 사용 후 연결했거나 저장한 정보를 꼭 제거하세요(WireGuard 하단 X표시)."
+            )
             print("! 첫 로그인 시 반드시 비밀번호를 변경해주세요.")
             print("")
 
         else:
             print("정보가 저장되지 않았습니다.")
             print("")
-        
+
         pause()
 
         return 0
@@ -123,6 +122,7 @@ def connect(id, pw):
         time.sleep(3)
         clear()
 
+
 def wg_install() -> int:
     if platform_name == "Windows":
         url = "https://download.wireguard.com/windows-client/wireguard-installer.exe"
@@ -130,16 +130,16 @@ def wg_install() -> int:
 
         try:
             response = requests.get(url, stream=True)
-            total_size = int(response.headers.get('content-length', 0))
+            total_size = int(response.headers.get("content-length", 0))
             block_size = 1024  # 1 KB
             downloaded = 0
 
-            file = open(save_path, 'wb')
+            file = open(save_path, "wb")
             for data in response.iter_content(block_size):
                 downloaded += len(data)
                 file.write(data)
                 progress = downloaded / total_size * 100
-                print(f"다운로드 진행률: {progress:.2f}%", end='\r')
+                print(f"다운로드 진행률: {progress:.2f}%", end="\r")
             print("\n다운로드 완료")
 
             # line break
@@ -149,7 +149,7 @@ def wg_install() -> int:
             file.close()
             os.system("wg-installer.exe")
             os.remove(save_path)
-            os.environ['PATH'] += os.pathsep + r"C:\Program Files\WireGuard"
+            os.environ["PATH"] += os.pathsep + r"C:\Program Files\WireGuard"
             print("설치 완료")
             return 0
         except KeyboardInterrupt:
@@ -161,6 +161,7 @@ def wg_install() -> int:
         print("Windows 이외의 운영체제에선 아직 지원하지 않습니다.")
         return 1
         # ~~
+
 
 def disconnect(id):
     clear()
@@ -176,19 +177,16 @@ def disconnect(id):
     time.sleep(2)
     exit()
 
+
 def change_password(id, pw, change_pw):
-    url = 'http://vpn.internal.dyhs.kr/password-change'
-    request = {
-        'id': id,
-        'password': pw,
-        'newPassword': change_pw
-    }
+    url = "http://vpn.internal.dyhs.kr/password-change"
+    request = {"id": id, "password": pw, "newPassword": change_pw}
 
     print("비밀번호 변경 중 . . . ")
     try:
         response = requests.post(url, json=request)
         response_data = response.json()
-        response_msg = response_data['message']
+        response_msg = response_data["message"]
     except KeyboardInterrupt:
         return 5
     except Exception as e:
@@ -204,7 +202,7 @@ def change_password(id, pw, change_pw):
             print(response_msg)
             return 2
     print("비밀번호 변경 완료")
-        
+
     print("")
     print("비밀번호가 변경되었습니다.")
     print(f"변경된 비밀번호 [{change_pw}]")
@@ -213,9 +211,11 @@ def change_password(id, pw, change_pw):
     pause()
 
     return 0
-        
+
 
 alert_msg = None
+
+
 def main():
     global alert_msg
 
@@ -239,7 +239,7 @@ def main():
         os.system("wg --version")
     else:
         print("WireGuard가 설치되어있지 않습니다. [설치: 0번]")
-    
+
     # admin check
     if is_admin() == False:
         print("현재 관리자 권한이 아닙니다.")
@@ -248,17 +248,21 @@ def main():
     if is_admin() == False:
         if platform_name == "Windows":
             print("관리자 권한으로 다시 실행합니다(Windows) . . . ")
-            ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+            ctypes.windll.shell32.ShellExecuteW(
+                None, "runas", sys.executable, " ".join(sys.argv), None, 1
+            )
             sys.exit()
         # ~~~
 
-    if alert_msg != None: print(f"\n! {alert_msg}", end="\n\n"); alert_msg = None
+    if alert_msg != None:
+        print(f"\n! {alert_msg}", end="\n\n")
+        alert_msg = None
     print("1. 도움말                  ")
     print("2. 외부망 연결             ")
     print("3. 연결 해제 (Linux 전용) ")
     print("4. 비밀번호 변경           ")
     print("5. 나가기                  ")
-    
+
     # menu select
     try:
         sel_menu = input("> ")
@@ -267,10 +271,10 @@ def main():
         print()
         program_exit()
         return 1
-    print("") # line brake
+    print("")  # line brake
 
     # menu 0
-    if sel_menu == '0':
+    if sel_menu == "0":
         clear()
         print("[ WireGuard 설치 페이지 ]")
 
@@ -284,7 +288,7 @@ def main():
         if ques_tf("WireGuard를 설치하시겠습니까? [Y/N]: ") == False:
             alert_msg = "WireGuard 설치를 취소했습니다."
             return 1
-        
+
         print()
         wg_install_rst = wg_install()
         print()
@@ -302,21 +306,23 @@ def main():
         pause()
 
         return 0
-        
+
     # menu 1
-    if sel_menu == '1':
+    if sel_menu == "1":
         clear()
         print("[ 도움말 페이지 ]")
         print("- 위 프로그램은 덕영고등학교 학생용 가상사설망(VPN) 클라이언트 입니다.")
         print("- 프로그램을 사용하기 위해서 관리자에게 계정생성을 요청해야 합니다.")
-        print("- 자세한 사항은 링크를 참고해주세요. (https://zerocoke.gitbook.io/dy-net/)")
+        print(
+            "- 자세한 사항은 링크를 참고해주세요. (https://zerocoke.gitbook.io/dy-net/)"
+        )
         print("")
         pause()
-        
+
         return 0
-    
+
     # menu 2
-    elif sel_menu == '2':
+    elif sel_menu == "2":
         clear()
         print("[ 외부망 접속 페이지 ]")
         if get_wg_installed() == False:
@@ -333,7 +339,7 @@ def main():
             except:
                 alert_msg = "외부망 연결을 취소했습니다."
                 return 1
-            
+
             print()
             connect_rst = connect(id, pw)
             print()
@@ -342,7 +348,10 @@ def main():
             elif connect_rst == 1:
                 print("! 아이디 또는 비밀번호가 틀렸습니다.", end=" ")
             elif connect_rst == 2:
-                print("! 알 수 없는 오류가 발생했습니다. 잠시 후 다시 시도하세요.", end=" ")
+                print(
+                    "! 알 수 없는 오류가 발생했습니다. 잠시 후 다시 시도하세요.",
+                    end=" ",
+                )
             elif connect_rst == 3:
                 return 1
             elif connect_rst == 4:
@@ -357,15 +366,15 @@ def main():
 
                 pause()
                 return 1
-                
+
             print("[나가기: Ctrl+C]", end="\n\n")
-        
+
     # menu 3
-    elif sel_menu == '3':
+    elif sel_menu == "3":
         clear()
         print("[ 연결 해제 페이지 ]")
 
-        if platform_name == 'Windows':
+        if platform_name == "Windows":
             print("현재 운영체제에선 지원하지 않는 기능입니다.")
             print()
             pause()
@@ -376,24 +385,24 @@ def main():
         except:
             alert_msg = "연결 해제를 취소했습니다."
             return 1
-        
+
         disconnect(id)
 
         return 0
 
     # menu 4
-    elif sel_menu == '4':
+    elif sel_menu == "4":
         clear()
         print("[ 비밀번호 변경 페이지 ]")
         while True:
             try:
-                id        = input("아 이 디: ")
-                pw        = getpass("비밀번호: ")
+                id = input("아 이 디: ")
+                pw = getpass("비밀번호: ")
                 change_pw = getpass("변경할 비밀번호를 입력해주세요: ")
             except:
                 alert_msg = "비밀번호 변경을 취소했습니다."
                 return 1
-            
+
             print("")
             change_pw_rst = change_password(id, pw, change_pw)
             print("")
@@ -402,7 +411,10 @@ def main():
             elif change_pw_rst == 1:
                 print("! 아이디 또는 비밀번호가 틀렸습니다.", end=" ")
             elif change_pw_rst == 2:
-                print("! 알 수 없는 오류가 발생했습니다. 잠시 후 다시 시도하세요.", end=" ")
+                print(
+                    "! 알 수 없는 오류가 발생했습니다. 잠시 후 다시 시도하세요.",
+                    end=" ",
+                )
             elif change_pw_rst == 3:
                 print("! 변경할 비밀번호가 기존 비밀번호와 같습니다.")
                 print("")
@@ -413,7 +425,7 @@ def main():
             elif change_pw_rst == 4:
                 print("! 인터넷 연결을 확인하세요.")
                 print()
-                
+
                 pause()
                 return 1
             elif change_pw_rst == 5:
@@ -423,13 +435,14 @@ def main():
                 pause()
                 return 1
             print("[나가기: Crtl+C]", end="\n\n")
-    
+
     # menu 5
-    elif sel_menu == '5':
+    elif sel_menu == "5":
         program_exit()
-    
+
     return 1
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     while True:
         main()
