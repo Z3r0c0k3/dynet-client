@@ -7,7 +7,6 @@ from getpass import getpass
 from ast import literal_eval
 import pyautogui
 import requests
-import requests
 
 from func import *
 from image2ascii.image2ascii import image2ascii
