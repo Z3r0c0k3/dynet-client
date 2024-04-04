@@ -121,7 +121,6 @@ def connect(id, pw):
         time.sleep(3)
         clear()
 
-
 def wg_install() -> int:
     if platform_name == "Windows":
         url = "https://download.wireguard.com/windows-client/wireguard-installer.exe"
@@ -178,7 +177,7 @@ def disconnect(id):
 
 
 def change_password(id, pw, change_pw):
-    url = "http://vpn.internal.dyhs.kr/password-change"
+    url = "http://vpn.external.dyhs.kr/password-change"
     request = {"id": id, "password": pw, "newPassword": change_pw}
 
     print("비밀번호 변경 중 . . . ")
